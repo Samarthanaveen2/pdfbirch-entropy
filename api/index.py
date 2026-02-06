@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- THE FRONTEND (Includes "Privacy Shield" Footer) ---
+# --- THE FRONTEND (With Adsterra Codes Integrated) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -21,16 +21,18 @@ HTML_PAGE = """
         
         .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 20px; }
         
-        .side-ad { width: 300px; height: 600px; background: #fff; border: 1px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; }
+        /* Side Ad Container */
+        .side-ad { width: 160px; height: 600px; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
         
         .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 460px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
         
-        @media (max-width: 1150px) { body { align-items: flex-start; overflow-y: auto; } .layout-grid { flex-direction: column; align-items: center; padding: 20px; } .side-ad { width: 100%; max-width: 480px; height: 100px; display: flex !important; } .side-ad.left { order: 1; margin-bottom: 16px; } .main-card { order: 2; margin-bottom: 16px; } .side-ad.right{ order: 3; } }
+        @media (max-width: 1150px) { body { align-items: flex-start; overflow-y: auto; } .layout-grid { flex-direction: column; align-items: center; padding: 20px; } .side-ad { display: none !important; } .main-card { order: 2; margin-bottom: 16px; } }
         
         h1 { font-size: 28px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
         p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 16px; font-weight: 500; }
         
-        .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; height: 160px; margin: 12px 0 20px 0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        /* Center Ad Container */
+        .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; min-height: 60px; margin: 12px 0 20px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
         .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
@@ -48,12 +50,36 @@ HTML_PAGE = """
 </head>
 <body>
     <div class="layout-grid">
-        <div class="side-ad left"><span>[ Ad Tower Left ]</span></div>
+        
+        <div class="side-ad left">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b',
+                    'format' : 'iframe',
+                    'height' : 600,
+                    'width' : 160,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/59bcd34a7d0fbed85bbe98e1b3aa6e8b/invoke.js"></script>
+        </div>
+
         <div class="main-card">
             <h1>Pdfbirch - Entropy Engine</h1>
             <p>Generate high-variance, cryptographically unique English datasets for pipeline validation.</p>
             
-            <div class="ad-slot-inner" id="ad-top">[ Sponsored Placement ]</div>
+            <div class="ad-slot-inner" id="ad-top">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '3bab905f2f3178c02c3534a0ea5773f6',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
+            </div>
             
             <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
             
@@ -62,7 +88,7 @@ HTML_PAGE = """
                 <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
             </div>
             
-            <div class="ad-slot-inner hidden" id="ad-middle" style="margin-top: 24px;">[ Video / Media ]</div>
+            <div class="ad-slot-inner hidden" id="ad-middle" style="margin-top: 24px;"></div>
             
             <div class="results-area" id="results">
                 <div style="text-align: left; margin-bottom: 12px; font-family:'JetBrains Mono'; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing:1px;">Manifest Ready</div>
@@ -81,9 +107,21 @@ HTML_PAGE = """
                     Not affiliated with any third-party file hosting platforms.
                 </p>
             </div>
-
         </div>
-        <div class="side-ad right"><span>[ Ad Tower Right ]</span></div>
+
+        <div class="side-ad right">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b',
+                    'format' : 'iframe',
+                    'height' : 600,
+                    'width' : 160,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/59bcd34a7d0fbed85bbe98e1b3aa6e8b/invoke.js"></script>
+        </div>
+
     </div>
     <script>
         function startSequence() {
@@ -157,4 +195,5 @@ def download():
     except Exception as e:
         return f"Error: {str(e)}"
 
+# Critical for Vercel
 app.debug = True
