@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- THE FRONTEND (UI Fixed: Compact Layout + Button Above Fold) ---
+# --- THE FRONTEND (Includes "Privacy Shield" Footer) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -17,23 +17,19 @@ HTML_PAGE = """
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #f8fafc; --text-main: #020617; --text-muted: #64748b; --card-bg: rgba(255, 255, 255, 0.85); --primary: #0f172a; }
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: hidden; } /* Locks scroll on desktop */
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: hidden; } 
         
-        /* Compact Layout Grid */
         .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 20px; }
         
         .side-ad { width: 300px; height: 600px; background: #fff; border: 1px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; }
         
-        /* Tighter Main Card padding */
         .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 460px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
         
-        /* Mobile: Allow scrolling, stack columns */
         @media (max-width: 1150px) { body { align-items: flex-start; overflow-y: auto; } .layout-grid { flex-direction: column; align-items: center; padding: 20px; } .side-ad { width: 100%; max-width: 480px; height: 100px; display: flex !important; } .side-ad.left { order: 1; margin-bottom: 16px; } .main-card { order: 2; margin-bottom: 16px; } .side-ad.right{ order: 3; } }
         
         h1 { font-size: 28px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
         p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 16px; font-weight: 500; }
         
-        /* Significantly Shorter Ad Slot (160px is standard) */
         .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; height: 160px; margin: 12px 0 20px 0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
         
         .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; }
@@ -77,6 +73,15 @@ HTML_PAGE = """
                 <a href="/api/download" class="download-item"><span>Dataset_Batch_L09.pdf</span> <span>↓</span></a>
                 <button class="btn-primary" onclick="location.reload()" style="margin-top:20px; background: white; color: #0f172a; border: 1px solid #e2e8f0; box-shadow:none;">Generate New Batch</button>
             </div>
+            
+            <div style="width: 100%; text-align: center; padding: 24px 0 0 0; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.6;">
+                <p style="margin: 0;">&copy; 2026 Pdfbirch.app &bull; <span style="color: #64748b;">Privacy & Testing Tool</span></p>
+                <p style="margin: 6px 0 0 0; font-size: 10px;">
+                    Generated documents are intended for pipeline validation, system load testing, and privacy protection.<br>
+                    Not affiliated with any third-party file hosting platforms.
+                </p>
+            </div>
+
         </div>
         <div class="side-ad right"><span>[ Ad Tower Right ]</span></div>
     </div>
@@ -152,5 +157,4 @@ def download():
     except Exception as e:
         return f"Error: {str(e)}"
 
-# Critical for Vercel
 app.debug = True
