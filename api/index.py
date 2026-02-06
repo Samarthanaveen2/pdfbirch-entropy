@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- 1. THE FRONTEND (Clean: No ugly placeholder text) ---
+# --- 1. THE FRONTEND (Fixed: pushed content down to clear the logo) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -16,15 +16,29 @@ HTML_PAGE = """
     <title>Pdfbirch | Entropy Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #f8fafc; --text-main: #020617; --text-muted: #64748b; --card-bg: rgba(255, 255, 255, 0.85); --primary: #0f172a; }
+        :root { --bg: #e2e8f0; --text-main: #020617; --text-muted: #64748b; --card-bg: #ffffff; --primary: #0f172a; }
         
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: auto; padding: 20px 0; position: relative; } 
+        body { 
+            margin: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; /* Start from top */
+            padding-bottom: 40px;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px); 
+            background-size: 32px 32px; 
+            position: relative; 
+        } 
         
-        /* BRAND HEADER */
+        /* BRAND HEADER - Fixed Position */
         .brand-header {
             position: absolute;
-            top: 20px;
-            left: 30px;
+            top: 24px;
+            left: 32px;
             font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
             font-size: 14px;
@@ -32,25 +46,61 @@ HTML_PAGE = """
             display: flex;
             align-items: center;
             gap: 8px;
-            opacity: 0.8;
             z-index: 100;
         }
         .brand-dot { width: 8px; height: 8px; background: #0f172a; border-radius: 50%; }
 
-        @media (max-width: 800px) { .brand-header { position: relative; top: 0; left: 0; margin-bottom: 20px; } }
+        /* Fixed Grid - Pushed DOWN significantly on desktop */
+        .layout-grid { 
+            display: flex; 
+            align-items: flex-start; 
+            justify-content: center; 
+            gap: 24px; 
+            width: 100%; 
+            max-width: 1200px; 
+            padding: 0 20px; 
+            box-sizing: border-box; 
+            margin-top: 100px; /* <--- THE FIX: Big gap so towers don't hit logo */
+        }
 
-        /* Fixed Centering Grid */
-        .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 0 10px; box-sizing: border-box; }
+        /* Mobile Adjustments */
+        @media (max-width: 800px) { 
+            .brand-header { position: relative; top: 0; left: 0; margin: 20px 0; }
+            .layout-grid { margin-top: 0; gap: 0; }
+            body { padding-top: 0; }
+        }
         
         /* Side Ad Container */
-        .side-ad { width: 160px; height: 600px; background: rgba(255,255,255,0.5); border: 1px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+        .side-ad { 
+            width: 160px; 
+            height: 600px; 
+            background: rgba(255,255,255,0.4); 
+            border: 1px dashed #94a3b8; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-shrink: 0; 
+            overflow: hidden; 
+        }
         
         /* Main Card */
-        .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); margin: 0 auto 20px auto; }
+        .main-card { 
+            background: var(--card-bg); 
+            border: 1px solid #fff; 
+            border-radius: 20px; 
+            padding: 32px 24px; 
+            width: 100%; 
+            max-width: 440px; 
+            text-align: center; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); 
+            flex-shrink: 0; 
+            z-index: 10;
+        }
         
+        /* Hide towers on smaller screens */
         @media (max-width: 1150px) { 
             .side-ad { display: none !important; } 
-            .layout-grid { gap: 0; }
         }
         
         h1 { font-size: 26px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
@@ -147,7 +197,7 @@ HTML_PAGE = """
                             atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
                         </script>
                         <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-                        </div>
+                     </div>
                 </div>
                 
                 <div class="ad-slot-inner ad-small">
@@ -187,7 +237,6 @@ HTML_PAGE = """
 
     <script>
         function startSequence() {
-            // ADS STAY ON.
             document.getElementById('start-btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
             let w = 0;
