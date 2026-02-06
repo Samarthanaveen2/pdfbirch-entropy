@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- 1. THE FRONTEND (Grid Aesthetic: Box within a Box) ---
+# --- 1. THE FRONTEND (Fixed: Ads stay visible during loading) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -59,22 +59,21 @@ HTML_PAGE = """
             display: block;
         }
 
-        /* --- INDIVIDUAL AD SLOTS (Dashed Borders Restored) --- */
+        /* --- INDIVIDUAL AD SLOTS --- */
         .ad-slot-inner { 
             background: #fff; 
-            border: 1px dashed #94a3b8; /* Visible dashed border */
+            border: 1px dashed #94a3b8; 
             border-radius: 8px;
             margin: 0 auto 16px auto; 
             display: flex; align-items: center; justify-content: center; overflow: hidden; width: 100%; max-width: 320px; 
         }
         .ad-slot-inner:last-child { margin-bottom: 0; }
         
-        /* Specific Heights */
         .ad-small { min-height: 50px; }
         .ad-big { min-height: 250px; background: #e2e8f0; } 
         
         /* Loader & Results */
-        .loader-container { margin-top: 24px; display: none; text-align: left; }
+        .loader-container { margin-top: 0; margin-bottom: 24px; display: none; text-align: left; }
         .status-header { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; }
         .progress-track { background: #e2e8f0; height: 4px; border-radius: 10px; overflow: hidden; }
         .progress-fill { background: #0f172a; height: 100%; width: 0%; transition: width 0.6s linear; }
@@ -101,6 +100,11 @@ HTML_PAGE = """
             <p>Generate high-variance, cryptographically unique English datasets for pipeline validation.</p>
             
             <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
+
+            <div class="loader-container" id="loader">
+                <div class="status-header"><span id="console-text">System Handshake...</span><span id="percent-text">0%</span></div>
+                <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
+            </div>
 
             <div class="ad-stack-wrapper">
                 <span class="ad-stack-label">Sponsored Placements</span>
@@ -129,11 +133,6 @@ HTML_PAGE = """
                     <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
                 </div>
             </div>
-            <div class="loader-container" id="loader">
-                <div class="status-header"><span id="console-text">System Handshake...</span><span id="percent-text">0%</span></div>
-                <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
-            </div>
-            
             <div class="results-area" id="results">
                 <div style="text-align: left; margin-bottom: 12px; font-family:'JetBrains Mono'; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing:1px;">Manifest Ready</div>
                 <a href="/api/download" class="download-item"><span>Dataset_Batch_A83.pdf</span> <span>↓</span></a>
@@ -164,8 +163,7 @@ HTML_PAGE = """
 
     <script>
         function startSequence() {
-            // Hide the ad box when sequence starts
-            document.querySelector('.ad-stack-wrapper').style.display = 'none';
+            // REMOVED THE LINE THAT HID THE ADS. MONEY MACHINE STAYS ON.
             
             document.getElementById('start-btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
@@ -182,8 +180,6 @@ HTML_PAGE = """
         function showResults() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('results').style.display = 'block';
-            // Show ad box again
-            document.querySelector('.ad-stack-wrapper').style.display = 'block';
         }
     </script>
 </body>
