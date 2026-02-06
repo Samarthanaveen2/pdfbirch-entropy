@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- THE FRONTEND (With Adsterra Codes Integrated) ---
+# --- THE FRONTEND (Double Ads + Fixed Footer) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -17,22 +17,21 @@ HTML_PAGE = """
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #f8fafc; --text-main: #020617; --text-muted: #64748b; --card-bg: rgba(255, 255, 255, 0.85); --primary: #0f172a; }
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: hidden; } 
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: auto; padding: 20px 0; } 
         
-        .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 20px; }
+        .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 0 20px; }
         
         /* Side Ad Container */
         .side-ad { width: 160px; height: 600px; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
         
-        .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 460px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+        .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 460px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
         
-        @media (max-width: 1150px) { body { align-items: flex-start; overflow-y: auto; } .layout-grid { flex-direction: column; align-items: center; padding: 20px; } .side-ad { display: none !important; } .main-card { order: 2; margin-bottom: 16px; } }
+        @media (max-width: 1150px) { .layout-grid { flex-direction: column; align-items: center; padding: 0 20px; } .side-ad { display: none !important; } }
         
         h1 { font-size: 28px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
         p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 16px; font-weight: 500; }
         
-        /* Center Ad Container */
-        .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; min-height: 60px; margin: 12px 0 20px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; min-height: 50px; margin: 12px 0 20px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
         .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
@@ -46,6 +45,8 @@ HTML_PAGE = """
         .download-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; margin: 8px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
         .download-item:hover { border-color: #94a3b8; transform: translateY(-1px); }
         .hidden { display: none; }
+        
+        .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.6; margin-top: auto; padding-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -53,13 +54,7 @@ HTML_PAGE = """
         
         <div class="side-ad left">
             <script type="text/javascript">
-                atOptions = {
-                    'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b',
-                    'format' : 'iframe',
-                    'height' : 600,
-                    'width' : 160,
-                    'params' : {}
-                };
+                atOptions = { 'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
             </script>
             <script type="text/javascript" src="//www.highperformanceformat.com/59bcd34a7d0fbed85bbe98e1b3aa6e8b/invoke.js"></script>
         </div>
@@ -70,25 +65,24 @@ HTML_PAGE = """
             
             <div class="ad-slot-inner" id="ad-top">
                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : '3bab905f2f3178c02c3534a0ea5773f6',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
+                    atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
             </div>
             
             <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
+
+            <div class="ad-slot-inner" id="ad-bottom" style="margin-top: 20px;">
+                <script type="text/javascript">
+                    atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
+            </div>
             
             <div class="loader-container" id="loader">
                 <div class="status-header"><span id="console-text">System Handshake...</span><span id="percent-text">0%</span></div>
                 <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
             </div>
-            
-            <div class="ad-slot-inner hidden" id="ad-middle" style="margin-top: 24px;"></div>
             
             <div class="results-area" id="results">
                 <div style="text-align: left; margin-bottom: 12px; font-family:'JetBrains Mono'; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing:1px;">Manifest Ready</div>
@@ -99,35 +93,29 @@ HTML_PAGE = """
                 <a href="/api/download" class="download-item"><span>Dataset_Batch_L09.pdf</span> <span>↓</span></a>
                 <button class="btn-primary" onclick="location.reload()" style="margin-top:20px; background: white; color: #0f172a; border: 1px solid #e2e8f0; box-shadow:none;">Generate New Batch</button>
             </div>
-            
-            <div style="width: 100%; text-align: center; padding: 24px 0 0 0; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.6;">
-                <p style="margin: 0;">&copy; 2026 Pdfbirch.app &bull; <span style="color: #64748b;">Privacy & Testing Tool</span></p>
-                <p style="margin: 6px 0 0 0; font-size: 10px;">
-                    Generated documents are intended for pipeline validation, system load testing, and privacy protection.<br>
-                    Not affiliated with any third-party file hosting platforms.
-                </p>
-            </div>
         </div>
 
         <div class="side-ad right">
             <script type="text/javascript">
-                atOptions = {
-                    'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b',
-                    'format' : 'iframe',
-                    'height' : 600,
-                    'width' : 160,
-                    'params' : {}
-                };
+                atOptions = { 'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
             </script>
             <script type="text/javascript" src="//www.highperformanceformat.com/59bcd34a7d0fbed85bbe98e1b3aa6e8b/invoke.js"></script>
         </div>
 
     </div>
+
+    <div class="footer-legal">
+        <p style="margin: 0;">&copy; 2026 Pdfbirch.app &bull; <span style="color: #64748b;">Privacy & Testing Tool</span></p>
+        <p style="margin: 6px 0 0 0; font-size: 10px;">
+            Generated documents are intended for pipeline validation, system load testing, and privacy protection.<br>
+            Not affiliated with any third-party file hosting platforms.
+        </p>
+    </div>
+
     <script>
         function startSequence() {
             document.getElementById('start-btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
-            document.getElementById('ad-middle').classList.remove('hidden');
             let w = 0;
             const fill = document.getElementById('fill');
             const txt = document.getElementById('console-text');
@@ -140,7 +128,6 @@ HTML_PAGE = """
         }
         function showResults() {
             document.getElementById('loader').style.display = 'none';
-            document.getElementById('ad-middle').classList.add('hidden');
             document.getElementById('results').style.display = 'block';
         }
     </script>
