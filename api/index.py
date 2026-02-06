@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- THE FRONTEND (Double Ads + Fixed Footer) ---
+# --- 1. THE FRONTEND (The UI, Ads, and Layout) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -17,36 +17,46 @@ HTML_PAGE = """
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #f8fafc; --text-main: #020617; --text-muted: #64748b; --card-bg: rgba(255, 255, 255, 0.85); --primary: #0f172a; }
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: auto; padding: 20px 0; } 
         
-        .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 0 20px; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: auto; padding: 20px 0; } 
+        
+        /* Fixed Centering Grid */
+        .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 0 10px; box-sizing: border-box; }
         
         /* Side Ad Container */
         .side-ad { width: 160px; height: 600px; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
         
-        .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 460px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
+        /* Main Card */
+        .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); margin: 0 auto 20px auto; }
         
-        @media (max-width: 1150px) { .layout-grid { flex-direction: column; align-items: center; padding: 0 20px; } .side-ad { display: none !important; } }
+        @media (max-width: 1150px) { 
+            .side-ad { display: none !important; } 
+            .layout-grid { gap: 0; }
+        }
         
-        h1 { font-size: 28px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
-        p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 16px; font-weight: 500; }
+        h1 { font-size: 26px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
+        p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 24px; font-weight: 500; }
         
-        .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; min-height: 50px; margin: 12px 0 20px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        /* Ad Slots */
+        .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin: 12px auto; display: flex; align-items: center; justify-content: center; overflow: hidden; width: 100%; max-width: 320px; }
         
-        .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; }
+        /* Specific Heights for the Stack */
+        .ad-small { min-height: 50px; }
+        .ad-big { min-height: 250px; background: #f1f5f9; } /* Placeholder for 300x250 */
+        
+        .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; margin-bottom: 20px; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
         
-        .loader-container { margin-top: 20px; display: none; text-align: left; }
+        .loader-container { margin-top: 10px; display: none; text-align: left; }
         .status-header { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; }
         .progress-track { background: #e2e8f0; height: 4px; border-radius: 10px; overflow: hidden; }
         .progress-fill { background: #0f172a; height: 100%; width: 0%; transition: width 0.6s linear; }
         
         .results-area { margin-top: 20px; display: none; border-top: 1px solid #f1f5f9; padding-top: 20px; }
         .download-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; margin: 8px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        .download-item:hover { border-color: #94a3b8; transform: translateY(-1px); }
         .hidden { display: none; }
         
-        .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.6; margin-top: auto; padding-bottom: 20px; }
+        .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.6; padding-bottom: 40px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -63,16 +73,26 @@ HTML_PAGE = """
             <h1>Pdfbirch - Entropy Engine</h1>
             <p>Generate high-variance, cryptographically unique English datasets for pipeline validation.</p>
             
-            <div class="ad-slot-inner" id="ad-top">
+            <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
+
+            <div class="ad-slot-inner ad-small">
                 <script type="text/javascript">
                     atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
             </div>
             
-            <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
-
-            <div class="ad-slot-inner" id="ad-bottom" style="margin-top: 20px;">
+            <div class="ad-slot-inner ad-big">
+                 <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%;">
+                    <script type="text/javascript">
+                        atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
+                    <span style="font-size:10px; color:#cbd5e1; margin-top:10px;">[ Big Box Slot ]</span>
+                 </div>
+            </div>
+            
+            <div class="ad-slot-inner ad-small">
                 <script type="text/javascript">
                     atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
                 </script>
@@ -135,7 +155,7 @@ HTML_PAGE = """
 </html>
 """
 
-# --- BACKEND LOGIC ---
+# --- 2. THE BACKEND (The Brains) ---
 WORDS = ["strategy", "growth", "market", "value", "user", "product", "system", "data", "cloud", "AI", "project", "scale"]
 
 def get_random_sentence():
