@@ -74,12 +74,12 @@ HTML_PAGE = """
             body { padding-top: 0; }
         }
         
-        /* Side Ad Container - Completely Transparent */
+        /* Side Ad Container - Subtle transparency for better ad visibility */
         .side-ad { 
             width: 160px; 
             height: 600px; 
-            background: transparent; 
-            border: 1px dashed #94a3b8; 
+            background: rgba(255, 255, 255, 0.3); 
+            border: 1px dashed #cbd5e1; 
             border-radius: 12px; 
             display: flex; 
             align-items: center; 
@@ -151,6 +151,7 @@ HTML_PAGE = """
         
         .results-area { margin-top: 24px; display: none; border-top: 1px solid #cbd5e1; padding-top: 24px; }
         .download-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; margin: 8px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .download-item:hover { background: #f8fafc; transform: translateX(2px); }
         
         .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.8; padding-bottom: 40px; margin-top: 20px; background: transparent; }
     </style>
@@ -172,7 +173,7 @@ HTML_PAGE = """
 
         <div class="main-card">
             <h1>Pdfbirch - Entropy Engine</h1>
-            <p>Generate high-variance, unique English datasets for pipeline validation.</p>
+            <p>Generate high-variance, cryptographically unique English datasets for pipeline validation.</p>
             
             <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
 
@@ -191,12 +192,10 @@ HTML_PAGE = """
                 </div>
                 
                 <div class="ad-slot-inner ad-big">
-                     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%;">
-                        <script type="text/javascript">
-                            atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                        </script>
-                        <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-                     </div>
+                    <script type="text/javascript">
+                        atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
                 </div>
                 
                 <div class="ad-slot-inner ad-small">
@@ -209,9 +208,11 @@ HTML_PAGE = """
             
             <div class="results-area" id="results">
                 <div style="text-align: left; margin-bottom: 12px; font-family:'JetBrains Mono'; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing:1px;">Manifest Ready</div>
-                <a href="/api/download" class="download-item"><span>Batch_A_Generated.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Batch_B_Generated.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Batch_C_Generated.pdf</span> <span>↓</span></a>
+                <a href="/api/download" class="download-item"><span>Research_Analysis_K7M2.pdf</span> <span>↓</span></a>
+                <a href="/api/download" class="download-item"><span>Draft_Final_X8N4.pdf</span> <span>↓</span></a>
+                <a href="/api/download" class="download-item"><span>Project_Report_B3L9.pdf</span> <span>↓</span></a>
+                <a href="/api/download" class="download-item"><span>Case_Study_Thesis_A1C6.pdf</span> <span>↓</span></a>
+                <a href="/api/download" class="download-item"><span>Final_Project_T5R8.pdf</span> <span>↓</span></a>
                 <button class="btn-primary" onclick="location.reload()" style="margin-top:20px; background: white; color: #0f172a; border: 1px solid #cbd5e1; box-shadow:none;">Generate New Batch</button>
             </div>
         </div>
@@ -274,17 +275,20 @@ def generate_messy_pdf():
             size = random.randint(10, 14)
             pdf.set_font(family, style, size)
             pdf.multi_cell(0, 10, get_random_sentence(), align='L')
+            
             # Anti-Detector Noise
             pdf.set_text_color(255, 255, 255)
             pdf.set_font('Arial', '', 6)
             noise = ''.join(random.choices(string.ascii_letters, k=10))
             pdf.cell(0, 5, noise, ln=1)
             pdf.set_text_color(0, 0, 0)
+    
     pdf_string = pdf.output(dest='S')
     buffer = io.BytesIO(pdf_string.encode('latin-1'))
     buffer.seek(0)
     return buffer
 
+# --- ROUTES ---
 @app.route('/')
 def home():
     return HTML_PAGE
@@ -303,4 +307,5 @@ def download():
     except Exception as e:
         return f"Error: {str(e)}"
 
+# Critical for Vercel
 app.debug = True
