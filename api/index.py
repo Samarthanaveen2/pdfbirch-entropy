@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- 1. THE FRONTEND (Fixed: Ads stay visible during loading) ---
+# --- 1. THE FRONTEND (Clean: No ugly placeholder text) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -18,12 +18,31 @@ HTML_PAGE = """
     <style>
         :root { --bg: #f8fafc; --text-main: #020617; --text-muted: #64748b; --card-bg: rgba(255, 255, 255, 0.85); --primary: #0f172a; }
         
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: auto; padding: 20px 0; } 
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; overflow-y: auto; padding: 20px 0; position: relative; } 
         
+        /* BRAND HEADER */
+        .brand-header {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 14px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.8;
+            z-index: 100;
+        }
+        .brand-dot { width: 8px; height: 8px; background: #0f172a; border-radius: 50%; }
+
+        @media (max-width: 800px) { .brand-header { position: relative; top: 0; left: 0; margin-bottom: 20px; } }
+
         /* Fixed Centering Grid */
         .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 0 10px; box-sizing: border-box; }
         
-        /* Side Ad Container (Ghost Border) */
+        /* Side Ad Container */
         .side-ad { width: 160px; height: 600px; background: rgba(255,255,255,0.5); border: 1px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
         
         /* Main Card */
@@ -43,7 +62,7 @@ HTML_PAGE = """
         /* --- THE AD ZONE BOX --- */
         .ad-stack-wrapper {
             margin-top: 32px;
-            border: 3px solid #0f172a; /* Thick dark border */
+            border: 3px solid #0f172a; 
             background: #f1f5f9;
             border-radius: 16px;
             padding: 20px 16px;
@@ -86,6 +105,12 @@ HTML_PAGE = """
     </style>
 </head>
 <body>
+    
+    <div class="brand-header">
+        <div class="brand-dot"></div>
+        <span>PDFBIRCH.APP</span>
+    </div>
+
     <div class="layout-grid">
         
         <div class="side-ad left">
@@ -122,8 +147,7 @@ HTML_PAGE = """
                             atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
                         </script>
                         <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-                        <span style="font-size:10px; color:#94a3b8; margin-top:10px;">[ Big Box Slot ]</span>
-                     </div>
+                        </div>
                 </div>
                 
                 <div class="ad-slot-inner ad-small">
@@ -163,8 +187,7 @@ HTML_PAGE = """
 
     <script>
         function startSequence() {
-            // REMOVED THE LINE THAT HID THE ADS. MONEY MACHINE STAYS ON.
-            
+            // ADS STAY ON.
             document.getElementById('start-btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
             let w = 0;
