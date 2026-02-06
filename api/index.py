@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- 1. THE FRONTEND (The UI, Ads, and Layout) ---
+# --- 1. THE FRONTEND (Grid Aesthetic: Box within a Box) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +14,7 @@ HTML_PAGE = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pdfbirch | Entropy Engine</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #f8fafc; --text-main: #020617; --text-muted: #64748b; --card-bg: rgba(255, 255, 255, 0.85); --primary: #0f172a; }
         
@@ -23,8 +23,8 @@ HTML_PAGE = """
         /* Fixed Centering Grid */
         .layout-grid { display: flex; align-items: flex-start; justify-content: center; gap: 20px; width: 100%; max-width: 1400px; padding: 0 10px; box-sizing: border-box; }
         
-        /* Side Ad Container */
-        .side-ad { width: 160px; height: 600px; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+        /* Side Ad Container (Ghost Border) */
+        .side-ad { width: 160px; height: 600px; background: rgba(255,255,255,0.5); border: 1px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
         
         /* Main Card */
         .main-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid #fff; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); margin: 0 auto 20px auto; }
@@ -37,22 +37,49 @@ HTML_PAGE = """
         h1 { font-size: 26px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
         p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 24px; font-weight: 500; }
         
-        /* Ad Slots */
-        .ad-slot-inner { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin: 12px auto; display: flex; align-items: center; justify-content: center; overflow: hidden; width: 100%; max-width: 320px; }
-        
-        /* Specific Heights for the Stack */
-        .ad-small { min-height: 50px; }
-        .ad-big { min-height: 250px; background: #f1f5f9; } /* Placeholder for 300x250 */
-        
-        .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; margin-bottom: 20px; }
+        .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; margin-bottom: 0; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
+
+        /* --- THE AD ZONE BOX --- */
+        .ad-stack-wrapper {
+            margin-top: 32px;
+            border: 3px solid #0f172a; /* Thick dark border */
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 20px 16px;
+        }
+        .ad-stack-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* --- INDIVIDUAL AD SLOTS (Dashed Borders Restored) --- */
+        .ad-slot-inner { 
+            background: #fff; 
+            border: 1px dashed #94a3b8; /* Visible dashed border */
+            border-radius: 8px;
+            margin: 0 auto 16px auto; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden; width: 100%; max-width: 320px; 
+        }
+        .ad-slot-inner:last-child { margin-bottom: 0; }
         
-        .loader-container { margin-top: 10px; display: none; text-align: left; }
+        /* Specific Heights */
+        .ad-small { min-height: 50px; }
+        .ad-big { min-height: 250px; background: #e2e8f0; } 
+        
+        /* Loader & Results */
+        .loader-container { margin-top: 24px; display: none; text-align: left; }
         .status-header { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; }
         .progress-track { background: #e2e8f0; height: 4px; border-radius: 10px; overflow: hidden; }
         .progress-fill { background: #0f172a; height: 100%; width: 0%; transition: width 0.6s linear; }
         
-        .results-area { margin-top: 20px; display: none; border-top: 1px solid #f1f5f9; padding-top: 20px; }
+        .results-area { margin-top: 24px; display: none; border-top: 1px solid #e2e8f0; padding-top: 24px; }
         .download-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; margin: 8px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
         .hidden { display: none; }
         
@@ -75,30 +102,33 @@ HTML_PAGE = """
             
             <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
 
-            <div class="ad-slot-inner ad-small">
-                <script type="text/javascript">
-                    atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-            </div>
-            
-            <div class="ad-slot-inner ad-big">
-                 <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%;">
+            <div class="ad-stack-wrapper">
+                <span class="ad-stack-label">Sponsored Placements</span>
+                
+                <div class="ad-slot-inner ad-small">
                     <script type="text/javascript">
                         atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
                     </script>
                     <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-                    <span style="font-size:10px; color:#cbd5e1; margin-top:10px;">[ Big Box Slot ]</span>
-                 </div>
+                </div>
+                
+                <div class="ad-slot-inner ad-big">
+                     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%;">
+                        <script type="text/javascript">
+                            atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
+                        <span style="font-size:10px; color:#94a3b8; margin-top:10px;">[ Big Box Slot ]</span>
+                     </div>
+                </div>
+                
+                <div class="ad-slot-inner ad-small">
+                    <script type="text/javascript">
+                        atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
+                </div>
             </div>
-            
-            <div class="ad-slot-inner ad-small">
-                <script type="text/javascript">
-                    atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-            </div>
-            
             <div class="loader-container" id="loader">
                 <div class="status-header"><span id="console-text">System Handshake...</span><span id="percent-text">0%</span></div>
                 <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
@@ -134,6 +164,9 @@ HTML_PAGE = """
 
     <script>
         function startSequence() {
+            // Hide the ad box when sequence starts
+            document.querySelector('.ad-stack-wrapper').style.display = 'none';
+            
             document.getElementById('start-btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
             let w = 0;
@@ -149,6 +182,8 @@ HTML_PAGE = """
         function showResults() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('results').style.display = 'block';
+            // Show ad box again
+            document.querySelector('.ad-stack-wrapper').style.display = 'block';
         }
     </script>
 </body>
