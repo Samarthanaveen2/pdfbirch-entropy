@@ -1,311 +1,137 @@
 from flask import Flask, send_file, make_response
 from fpdf import FPDF
-import random
-import string
-import io
+import random, string, io
 
 app = Flask(__name__)
 
-# --- 1. THE FRONTEND (Transparent Glass UI + Fixed Naming) ---
+# --- 1. THE FRONTEND (Premium Minimalist UI) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pdfbirch | Entropy Engine</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <title>Pdfbirch | Privacy Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #f8fafc; --text-main: #020617; --text-muted: #64748b; --primary: #0f172a; }
+        :root { --bg: #f8fafc; --primary: #0f172a; --accent: #22c55e; --muted: #94a3b8; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--primary); background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; }
         
-        body { 
-            margin: 0; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: flex-start; 
-            padding-bottom: 40px;
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px); 
-            background-size: 32px 32px; 
-            position: relative; 
-        } 
-        
-        /* BRAND HEADER - Transparent */
-        .brand-header {
-            position: absolute;
-            top: 24px;
-            left: 32px;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-            font-size: 14px;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 100;
-            background: transparent;
-        }
-        
-        .brand-dot { 
-            width: 8px; 
-            height: 8px; 
-            background: #22c55e; 
-            border-radius: 50%; 
-        }
+        .nav { width: 100%; max-width: 1100px; padding: 40px 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; text-decoration: none; color: inherit; }
+        .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
 
-        .layout-grid { 
-            display: flex; 
-            align-items: flex-start; 
-            justify-content: center; 
-            gap: 24px; 
-            width: 100%; 
-            max-width: 1200px; 
-            padding: 0 20px; 
-            box-sizing: border-box; 
-            margin-top: 100px; 
-        }
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 500px; padding: 0 20px; box-sizing: border-box; text-align: center; }
+        h1 { font-size: 36px; font-weight: 800; letter-spacing: -2px; margin: 0 0 16px 0; line-height: 1; }
+        p { color: #64748b; font-size: 16px; line-height: 1.6; margin-bottom: 40px; }
+        
+        .btn { background: var(--primary); color: white; border: none; padding: 22px; width: 100%; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.2); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 20px 35px -10px rgba(15,23,42,0.3); }
 
-        @media (max-width: 800px) { 
-            .brand-header { position: relative; top: 0; left: 0; margin: 20px 0; }
-            .layout-grid { margin-top: 0; gap: 0; }
-            body { padding-top: 0; }
-        }
+        .loader { margin-top: 40px; display: none; width: 100%; }
+        .bar-bg { background: #f1f5f9; height: 10px; border-radius: 10px; overflow: hidden; margin-top: 15px; }
+        .bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.3s linear; }
         
-        /* Side Ad Container - Subtle transparency for better ad visibility */
-        .side-ad { 
-            width: 160px; 
-            height: 600px; 
-            background: rgba(255, 255, 255, 0.3); 
-            border: 1px dashed #cbd5e1; 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex-shrink: 0; 
-            overflow: hidden; 
-        }
+        .results { margin-top: 40px; display: none; width: 100%; }
+        .file-link { display: flex; justify-content: space-between; padding: 20px; background: rgba(255,255,255,0.8); border: 1px solid #e2e8f0; border-radius: 16px; text-decoration: none; color: var(--primary); font-weight: 700; font-size: 14px; margin-bottom: 12px; transition: 0.2s; }
+        .file-link:hover { border-color: var(--primary); background: #fff; transform: scale(1.02); }
         
-        /* Main Card - Transparent White Glass */
-        .main-card { 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5); 
-            border-radius: 20px; 
-            padding: 32px 24px; 
-            width: 100%; 
-            max-width: 440px; 
-            text-align: center; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); 
-            flex-shrink: 0; 
-            z-index: 10;
-        }
+        .support-box { margin-top: 80px; padding-top: 40px; border-top: 1px solid #f1f5f9; width: 100%; }
+        .affiliate-card { background: rgba(255,255,255,0.8); border: 1px dashed #cbd5e1; border-radius: 20px; padding: 24px; text-align: left; display: flex; align-items: center; gap: 18px; text-decoration: none; color: inherit; transition: 0.2s; }
+        .affiliate-card:hover { border-style: solid; border-color: var(--primary); background: #fff; transform: translateY(-3px); }
+        .affiliate-icon { width: 44px; height: 44px; background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        @media (max-width: 1150px) { .side-ad { display: none !important; } }
-        
-        h1 { font-size: 26px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
-        p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 24px; font-weight: 500; }
-        
-        .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; margin-bottom: 0; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
+        .donation-btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #94a3b8; text-decoration: none; transition: 0.2s; padding: 10px 15px; border-radius: 10px; }
+        .donation-btn:hover { background: rgba(255,255,255,0.8); color: var(--primary); }
 
-        /* --- THE AD ZONE BOX - Transparent White --- */
-        .ad-stack-wrapper {
-            margin-top: 32px;
-            border: 3px solid #0f172a; 
-            background: rgba(255, 255, 255, 0.4); 
-            border-radius: 16px;
-            padding: 20px 16px;
-        }
-        
-        .ad-stack-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            font-weight: 700;
-            color: #0f172a;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        .ad-slot-inner { 
-            background: rgba(255, 255, 255, 0.6); 
-            border: 1px dashed #94a3b8; 
-            border-radius: 8px;
-            margin: 0 auto 16px auto; 
-            display: flex; align-items: center; justify-content: center; overflow: hidden; width: 100%; max-width: 320px; 
-        }
-        
-        .ad-slot-inner:last-child { margin-bottom: 0; }
-        .ad-small { min-height: 50px; }
-        .ad-big { min-height: 250px; } 
-        
-        .loader-container { margin-top: 0; margin-bottom: 24px; display: none; text-align: left; }
-        .status-header { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; }
-        .progress-track { background: #cbd5e1; height: 4px; border-radius: 10px; overflow: hidden; }
-        .progress-fill { background: #0f172a; height: 100%; width: 0%; transition: width 0.6s linear; }
-        
-        .results-area { margin-top: 24px; display: none; border-top: 1px solid #cbd5e1; padding-top: 24px; }
-        .download-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; margin: 8px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        .download-item:hover { background: #f8fafc; transform: translateX(2px); }
-        
-        .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.8; padding-bottom: 40px; margin-top: 20px; background: transparent; }
+        footer { padding: 40px; color: #cbd5e1; font-size: 12px; font-family: 'JetBrains Mono'; opacity: 0.7; }
     </style>
 </head>
 <body>
-    
-    <div class="brand-header">
-        <div class="brand-dot"></div>
-        <span>PDFBIRCH.APP</span>
+    <div class="nav">
+        <a href="/" class="logo"><div class="dot"></div>PDFBIRCH.APP</a>
+        <a href="https://www.buymeacoffee.com/YOUR_USER" target="_blank" class="donation-btn">☕ Support Project</a>
     </div>
 
-    <div class="layout-grid">
-        <div class="side-ad left">
-            <script type="text/javascript">
-                atOptions = { 'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
-            </script>
-            <script type="text/javascript" src="//www.highperformanceformat.com/59bcd34a7d0fbed85bbe98e1b3aa6e8b/invoke.js"></script>
+    <div class="container">
+        <h1>Entropy Engine</h1>
+        <p>A high-variance dataset generator for privacy testing and pipeline validation.</p>
+        
+        <button class="btn" id="start-btn" onclick="start()">Initialize Engine</button>
+
+        <div class="loader" id="loader">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-family:'JetBrains Mono'; font-weight:700; color: #94a3b8;">
+                <span>Randomizing Vectors...</span><span id="pct">0%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" id="fill"></div></div>
         </div>
 
-        <div class="main-card">
-            <h1>Pdfbirch - Entropy Engine</h1>
-            <p>Generate high-variance, cryptographically unique English datasets for pipeline validation.</p>
-            
-            <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
-
-            <div class="loader-container" id="loader">
-                <div class="status-header"><span id="console-text">System Handshake...</span><span id="percent-text">0%</span></div>
-                <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
-            </div>
-
-            <div class="ad-stack-wrapper">
-                <span class="ad-stack-label">Sponsored Placements</span>
-                <div class="ad-slot-inner ad-small">
-                    <script type="text/javascript">
-                        atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-                </div>
-                
-                <div class="ad-slot-inner ad-big">
-                    <script type="text/javascript">
-                        atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-                </div>
-                
-                <div class="ad-slot-inner ad-small">
-                    <script type="text/javascript">
-                        atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
-                </div>
-            </div>
-            
-            <div class="results-area" id="results">
-                <div style="text-align: left; margin-bottom: 12px; font-family:'JetBrains Mono'; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing:1px;">Manifest Ready</div>
-                <a href="/api/download" class="download-item"><span>Research_Analysis_K7M2.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Draft_Final_X8N4.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Project_Report_B3L9.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Case_Study_Thesis_A1C6.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Final_Project_T5R8.pdf</span> <span>↓</span></a>
-                <button class="btn-primary" onclick="location.reload()" style="margin-top:20px; background: white; color: #0f172a; border: 1px solid #cbd5e1; box-shadow:none;">Generate New Batch</button>
-            </div>
+        <div class="results" id="results">
+            <a href="/api/download" class="file-link"><span>Research_Analysis_K7M2.pdf</span> <span>↓</span></a>
+            <a href="/api/download" class="file-link"><span>Draft_Final_X8N4.pdf</span> <span>↓</span></a>
+            <a href="/api/download" class="file-link"><span>Project_Report_B3L9.pdf</span> <span>↓</span></a>
+            <a href="/api/download" class="file-link"><span>Case_Study_Thesis_A1C6.pdf</span> <span>↓</span></a>
+            <a href="/api/download" class="file-link"><span>Final_Project_T5R8.pdf</span> <span>↓</span></a>
+            <button class="btn" onclick="location.reload()" style="background:none; color:var(--primary); box-shadow:none; border:1px solid #e2e8f0; margin-top:20px;">Generate New Batch</button>
         </div>
 
-        <div class="side-ad right">
-            <script type="text/javascript">
-                atOptions = { 'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
-            </script>
-            <script type="text/javascript" src="//www.highperformanceformat.com/59bcd34a7d0fbed85bbe98e1b3aa6e8b/invoke.js"></script>
+        <div class="support-box">
+            <div style="font-family:'JetBrains Mono'; font-size:11px; color:#cbd5e1; text-transform:uppercase; letter-spacing:2px; margin-bottom:15px; text-align:left; opacity:0.8;">Verified Resources</div>
+            <a href="YOUR_LINK" target="_blank" class="affiliate-card">
+                <div class="affiliate-icon">🛡️</div>
+                <div style="flex:1">
+                    <div style="font-weight:800; font-size:15px;">Secure Your Work</div>
+                    <div style="font-size:13px; color:#94a3b8;">Protect your downloads with NordVPN.</div>
+                </div>
+                <div style="font-size:20px; color:#94a3b8;">→</div>
+            </a>
         </div>
     </div>
 
-    <div class="footer-legal">
-        <p style="margin: 0;">&copy; 2026 Pdfbirch.app &bull; <span style="color: #64748b;">Privacy & Testing Tool</span></p>
-        <p style="margin: 6px 0 0 0; font-size: 10px;">
-            Generated documents are intended for pipeline validation, system load testing, and privacy protection.<br>
-            Not affiliated with any third-party file hosting platforms.
-        </p>
-    </div>
+    <footer>&copy; 2026 Pdfbirch &bull; Privacy Validation System</footer>
 
     <script>
-        function startSequence() {
-            document.getElementById('start-btn').style.display = 'none';
-            document.getElementById('loader').style.display = 'block';
-            let w = 0;
-            const fill = document.getElementById('fill');
-            const txt = document.getElementById('console-text');
-            const pct = document.getElementById('percent-text');
-            const timer = setInterval(() => {
-                w++; fill.style.width = w + '%'; pct.innerText = w + '%';
-                if(w < 20) txt.innerText = "Encrypting Handshake..."; else if(w < 40) txt.innerText = "Allocating Dictionary..."; else if(w < 60) txt.innerText = "Randomizing Vectors..."; else if(w < 85) txt.innerText = "Injecting Entropy..."; else txt.innerText = "Finalizing Output...";
-                if(w >= 100) { clearInterval(timer); showResults(); }
-            }, 600); 
-        }
-        function showResults() {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('results').style.display = 'block';
+        function start() {
+            document.getElementById('start-btn').style.display='none';
+            document.getElementById('loader').style.display='block';
+            let w=0; const f=document.getElementById('fill'), p=document.getElementById('pct');
+            const t=setInterval(()=>{
+                w++; f.style.width=w+'%'; p.innerText=w+'%';
+                if(w>=100){ clearInterval(t); document.getElementById('loader').style.display='none'; document.getElementById('results').style.display='block'; }
+            }, 30);
         }
     </script>
 </body>
 </html>
 """
 
-# --- 2. BACKEND (High Entropy Naming) ---
-WORDS = ["strategy", "growth", "market", "value", "user", "product", "system", "data", "cloud", "AI", "project", "scale"]
+# --- 2. THE BACKEND (Naming & Formatting) ---
 PREFIXES = ["Research", "Analysis", "Draft", "Final", "Project", "Report", "Case_Study", "Thesis"]
+WORDS = ["strategy", "growth", "market", "value", "user", "product", "system", "data", "cloud", "AI", "project", "scale"]
 
-def get_random_sentence():
-    length = random.randint(10, 20)
-    return " ".join(random.choice(WORDS) for _ in range(length)).capitalize() + "."
-
-def generate_messy_pdf():
+def gen_pdf():
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     for _ in range(10):
         pdf.add_page()
-        for _ in range(20):
-            family = random.choice(['Arial', 'Times', 'Courier'])
-            style = random.choice(['', 'B', 'I'])
-            size = random.randint(10, 14)
-            pdf.set_font(family, style, size)
-            pdf.multi_cell(0, 10, get_random_sentence(), align='L')
-            
-            # Anti-Detector Noise
-            pdf.set_text_color(255, 255, 255)
-            pdf.set_font('Arial', '', 6)
-            noise = ''.join(random.choices(string.ascii_letters, k=10))
-            pdf.cell(0, 5, noise, ln=1)
-            pdf.set_text_color(0, 0, 0)
-    
-    pdf_string = pdf.output(dest='S')
-    buffer = io.BytesIO(pdf_string.encode('latin-1'))
-    buffer.seek(0)
-    return buffer
+        pdf.set_font('Arial', '', 12)
+        for _ in range(25):
+            line = " ".join(random.choice(WORDS) for _ in range(random.randint(10,20))).capitalize() + "."
+            pdf.multi_cell(0, 10, line)
+            # Metadata Noise
+            pdf.set_text_color(255,255,255); pdf.set_font('Arial','',6)
+            pdf.cell(0,5,''.join(random.choices(string.ascii_letters, k=15)), ln=1)
+            pdf.set_text_color(0,0,0); pdf.set_font('Arial','',12)
+    return io.BytesIO(pdf.output(dest='S').encode('latin-1'))
 
-# --- ROUTES ---
 @app.route('/')
-def home():
-    return HTML_PAGE
+def home(): return HTML_PAGE
 
 @app.route('/api/download')
 def download():
-    try:
-        pdf_buffer = generate_messy_pdf()
-        pre = random.choice(PREFIXES)
-        mid = random.choice(PREFIXES)
-        suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-        filename = f"{pre}_{mid}_{suffix}.pdf"
-        
-        response = make_response(send_file(pdf_buffer, as_attachment=True, download_name=filename, mimetype='application/pdf'))
-        return response
-    except Exception as e:
-        return f"Error: {str(e)}"
+    buf = gen_pdf(); buf.seek(0)
+    name = f"{random.choice(PREFIXES)}_{random.choice(PREFIXES)}_{''.join(random.choices(string.ascii_uppercase+string.digits, k=4))}.pdf"
+    return make_response(send_file(buf, as_attachment=True, download_name=name, mimetype='application/pdf'))
 
 # Critical for Vercel
 app.debug = True
