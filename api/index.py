@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- 1. THE FRONTEND (Solid Green Dot + Glass UI) ---
+# --- 1. THE FRONTEND (Transparent Glass UI + Fixed Naming) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +22,6 @@ HTML_PAGE = """
             margin: 0; 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: var(--bg); 
-            color: var(--text-main); 
             min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
@@ -34,7 +33,7 @@ HTML_PAGE = """
             position: relative; 
         } 
         
-        /* BRAND HEADER */
+        /* BRAND HEADER - Transparent */
         .brand-header {
             position: absolute;
             top: 24px;
@@ -47,17 +46,16 @@ HTML_PAGE = """
             align-items: center;
             gap: 10px;
             z-index: 100;
+            background: transparent;
         }
         
-        /* SOLID GREEN DOT */
         .brand-dot { 
             width: 8px; 
             height: 8px; 
             background: #22c55e; 
             border-radius: 50%; 
         }
-        
-        /* Grid Layout */
+
         .layout-grid { 
             display: flex; 
             align-items: flex-start; 
@@ -76,7 +74,7 @@ HTML_PAGE = """
             body { padding-top: 0; }
         }
         
-        /* Side Ad (Transparent) */
+        /* Side Ad Container - Completely Transparent */
         .side-ad { 
             width: 160px; 
             height: 600px; 
@@ -90,18 +88,18 @@ HTML_PAGE = """
             overflow: hidden; 
         }
         
-        /* Glass Card */
+        /* Main Card - Transparent White Glass */
         .main-card { 
-            background: rgba(255, 255, 255, 0.9); 
+            background: rgba(255, 255, 255, 0.8); 
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid #fff; 
+            border: 1px solid rgba(255, 255, 255, 0.5); 
             border-radius: 20px; 
             padding: 32px 24px; 
             width: 100%; 
             max-width: 440px; 
             text-align: center; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); 
             flex-shrink: 0; 
             z-index: 10;
         }
@@ -114,14 +112,15 @@ HTML_PAGE = """
         .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; margin-bottom: 0; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
 
-        /* Ad Zone (Transparent) */
+        /* --- THE AD ZONE BOX - Transparent White --- */
         .ad-stack-wrapper {
             margin-top: 32px;
             border: 3px solid #0f172a; 
-            background: transparent; 
+            background: rgba(255, 255, 255, 0.4); 
             border-radius: 16px;
             padding: 20px 16px;
         }
+        
         .ad-stack-label {
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
@@ -134,27 +133,30 @@ HTML_PAGE = """
         }
 
         .ad-slot-inner { 
-            background: #fff; 
+            background: rgba(255, 255, 255, 0.6); 
             border: 1px dashed #94a3b8; 
             border-radius: 8px;
             margin: 0 auto 16px auto; 
             display: flex; align-items: center; justify-content: center; overflow: hidden; width: 100%; max-width: 320px; 
         }
+        
         .ad-slot-inner:last-child { margin-bottom: 0; }
         .ad-small { min-height: 50px; }
-        .ad-big { min-height: 250px; background: #e2e8f0; } 
+        .ad-big { min-height: 250px; } 
         
         .loader-container { margin-top: 0; margin-bottom: 24px; display: none; text-align: left; }
         .status-header { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; }
-        .progress-track { background: #e2e8f0; height: 4px; border-radius: 10px; overflow: hidden; }
+        .progress-track { background: #cbd5e1; height: 4px; border-radius: 10px; overflow: hidden; }
         .progress-fill { background: #0f172a; height: 100%; width: 0%; transition: width 0.6s linear; }
         
-        .results-area { margin-top: 24px; display: none; border-top: 1px solid #e2e8f0; padding-top: 24px; }
+        .results-area { margin-top: 24px; display: none; border-top: 1px solid #cbd5e1; padding-top: 24px; }
         .download-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; margin: 8px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.6; padding-bottom: 40px; margin-top: 20px; }
+        
+        .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.8; padding-bottom: 40px; margin-top: 20px; background: transparent; }
     </style>
 </head>
 <body>
+    
     <div class="brand-header">
         <div class="brand-dot"></div>
         <span>PDFBIRCH.APP</span>
@@ -170,7 +172,8 @@ HTML_PAGE = """
 
         <div class="main-card">
             <h1>Pdfbirch - Entropy Engine</h1>
-            <p>Generate high-variance, cryptographically unique English datasets for pipeline validation.</p>
+            <p>Generate high-variance, unique English datasets for pipeline validation.</p>
+            
             <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
 
             <div class="loader-container" id="loader">
@@ -186,6 +189,7 @@ HTML_PAGE = """
                     </script>
                     <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
                 </div>
+                
                 <div class="ad-slot-inner ad-big">
                      <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%;">
                         <script type="text/javascript">
@@ -194,6 +198,7 @@ HTML_PAGE = """
                         <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
                      </div>
                 </div>
+                
                 <div class="ad-slot-inner ad-small">
                     <script type="text/javascript">
                         atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -204,12 +209,10 @@ HTML_PAGE = """
             
             <div class="results-area" id="results">
                 <div style="text-align: left; margin-bottom: 12px; font-family:'JetBrains Mono'; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing:1px;">Manifest Ready</div>
-                <a href="/api/download" class="download-item"><span>Dataset_Batch_A83.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Dataset_Batch_X92.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Dataset_Batch_B11.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Dataset_Batch_G44.pdf</span> <span>↓</span></a>
-                <a href="/api/download" class="download-item"><span>Dataset_Batch_L09.pdf</span> <span>↓</span></a>
-                <button class="btn-primary" onclick="location.reload()" style="margin-top:20px; background: white; color: #0f172a; border: 1px solid #e2e8f0; box-shadow:none;">Generate New Batch</button>
+                <a href="/api/download" class="download-item"><span>Batch_A_Generated.pdf</span> <span>↓</span></a>
+                <a href="/api/download" class="download-item"><span>Batch_B_Generated.pdf</span> <span>↓</span></a>
+                <a href="/api/download" class="download-item"><span>Batch_C_Generated.pdf</span> <span>↓</span></a>
+                <button class="btn-primary" onclick="location.reload()" style="margin-top:20px; background: white; color: #0f172a; border: 1px solid #cbd5e1; box-shadow:none;">Generate New Batch</button>
             </div>
         </div>
 
@@ -222,7 +225,7 @@ HTML_PAGE = """
     </div>
 
     <div class="footer-legal">
-        <p style="margin: 0;">&copy; 2026 Pdfbirch.app &bull; <span style="color: #64748b;">Privacy & Testing Tool</span></p>
+        <p>&copy; 2026 Pdfbirch.app &bull; <span style="color: #64748b;">Privacy & Testing Tool</span></p>
     </div>
 
     <script>
@@ -248,18 +251,18 @@ HTML_PAGE = """
 </html>
 """
 
-# --- 2. BACKEND LOGIC ---
+# --- 2. BACKEND (High Entropy Naming) ---
 WORDS = ["strategy", "growth", "market", "value", "user", "product", "system", "data", "cloud", "AI", "project", "scale"]
+PREFIXES = ["Research", "Analysis", "Draft", "Final", "Project", "Report", "Case_Study", "Thesis"]
 
 def get_random_sentence():
     length = random.randint(10, 20)
-    sentence = " ".join(random.choice(WORDS) for _ in range(length))
-    return sentence.capitalize() + "."
+    return " ".join(random.choice(WORDS) for _ in range(length)).capitalize() + "."
 
 def generate_messy_pdf():
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
-    for page in range(10):
+    for _ in range(10):
         pdf.add_page()
         for _ in range(20):
             family = random.choice(['Arial', 'Times', 'Courier'])
@@ -267,6 +270,7 @@ def generate_messy_pdf():
             size = random.randint(10, 14)
             pdf.set_font(family, style, size)
             pdf.multi_cell(0, 10, get_random_sentence(), align='L')
+            # Anti-Detector Noise
             pdf.set_text_color(255, 255, 255)
             pdf.set_font('Arial', '', 6)
             noise = ''.join(random.choices(string.ascii_letters, k=10))
@@ -285,7 +289,11 @@ def home():
 def download():
     try:
         pdf_buffer = generate_messy_pdf()
-        filename = f"Dataset_{random.randint(1000,9999)}.pdf"
+        pre = random.choice(PREFIXES)
+        mid = random.choice(PREFIXES)
+        suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        filename = f"{pre}_{mid}_{suffix}.pdf"
+        
         response = make_response(send_file(pdf_buffer, as_attachment=True, download_name=filename, mimetype='application/pdf'))
         return response
     except Exception as e:
