@@ -6,7 +6,7 @@ import io
 
 app = Flask(__name__)
 
-# --- 1. THE FRONTEND (Fixed: pushed content down to clear the logo) ---
+# --- 1. THE FRONTEND (Solid Green Dot + Glass UI) ---
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +16,7 @@ HTML_PAGE = """
     <title>Pdfbirch | Entropy Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #e2e8f0; --text-main: #020617; --text-muted: #64748b; --card-bg: #ffffff; --primary: #0f172a; }
+        :root { --bg: #e2e8f0; --text-main: #020617; --text-muted: #64748b; --primary: #0f172a; }
         
         body { 
             margin: 0; 
@@ -27,14 +27,14 @@ HTML_PAGE = """
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: flex-start; /* Start from top */
+            justify-content: flex-start; 
             padding-bottom: 40px;
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px); 
             background-size: 32px 32px; 
             position: relative; 
         } 
         
-        /* BRAND HEADER - Fixed Position */
+        /* BRAND HEADER */
         .brand-header {
             position: absolute;
             top: 24px;
@@ -45,12 +45,19 @@ HTML_PAGE = """
             color: #0f172a;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             z-index: 100;
         }
-        .brand-dot { width: 8px; height: 8px; background: #0f172a; border-radius: 50%; }
-
-        /* Fixed Grid - Pushed DOWN significantly on desktop */
+        
+        /* SOLID GREEN DOT */
+        .brand-dot { 
+            width: 8px; 
+            height: 8px; 
+            background: #22c55e; 
+            border-radius: 50%; 
+        }
+        
+        /* Grid Layout */
         .layout-grid { 
             display: flex; 
             align-items: flex-start; 
@@ -60,21 +67,20 @@ HTML_PAGE = """
             max-width: 1200px; 
             padding: 0 20px; 
             box-sizing: border-box; 
-            margin-top: 100px; /* <--- THE FIX: Big gap so towers don't hit logo */
+            margin-top: 100px; 
         }
 
-        /* Mobile Adjustments */
         @media (max-width: 800px) { 
             .brand-header { position: relative; top: 0; left: 0; margin: 20px 0; }
             .layout-grid { margin-top: 0; gap: 0; }
             body { padding-top: 0; }
         }
         
-        /* Side Ad Container */
+        /* Side Ad (Transparent) */
         .side-ad { 
             width: 160px; 
             height: 600px; 
-            background: rgba(255,255,255,0.4); 
+            background: transparent; 
             border: 1px dashed #94a3b8; 
             border-radius: 12px; 
             display: flex; 
@@ -84,9 +90,11 @@ HTML_PAGE = """
             overflow: hidden; 
         }
         
-        /* Main Card */
+        /* Glass Card */
         .main-card { 
-            background: var(--card-bg); 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid #fff; 
             border-radius: 20px; 
             padding: 32px 24px; 
@@ -98,10 +106,7 @@ HTML_PAGE = """
             z-index: 10;
         }
         
-        /* Hide towers on smaller screens */
-        @media (max-width: 1150px) { 
-            .side-ad { display: none !important; } 
-        }
+        @media (max-width: 1150px) { .side-ad { display: none !important; } }
         
         h1 { font-size: 26px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1.0px; color: #0f172a; line-height: 1.1; }
         p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 24px; font-weight: 500; }
@@ -109,11 +114,11 @@ HTML_PAGE = """
         .btn-primary { background: #0f172a; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); letter-spacing: -0.3px; margin-bottom: 0; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
 
-        /* --- THE AD ZONE BOX --- */
+        /* Ad Zone (Transparent) */
         .ad-stack-wrapper {
             margin-top: 32px;
             border: 3px solid #0f172a; 
-            background: #f1f5f9;
+            background: transparent; 
             border-radius: 16px;
             padding: 20px 16px;
         }
@@ -128,7 +133,6 @@ HTML_PAGE = """
             display: block;
         }
 
-        /* --- INDIVIDUAL AD SLOTS --- */
         .ad-slot-inner { 
             background: #fff; 
             border: 1px dashed #94a3b8; 
@@ -137,11 +141,9 @@ HTML_PAGE = """
             display: flex; align-items: center; justify-content: center; overflow: hidden; width: 100%; max-width: 320px; 
         }
         .ad-slot-inner:last-child { margin-bottom: 0; }
-        
         .ad-small { min-height: 50px; }
         .ad-big { min-height: 250px; background: #e2e8f0; } 
         
-        /* Loader & Results */
         .loader-container { margin-top: 0; margin-bottom: 24px; display: none; text-align: left; }
         .status-header { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; }
         .progress-track { background: #e2e8f0; height: 4px; border-radius: 10px; overflow: hidden; }
@@ -149,20 +151,16 @@ HTML_PAGE = """
         
         .results-area { margin-top: 24px; display: none; border-top: 1px solid #e2e8f0; padding-top: 24px; }
         .download-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; margin: 8px 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        .hidden { display: none; }
-        
         .footer-legal { width: 100%; text-align: center; color: #94a3b8; font-size: 11px; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.6; padding-bottom: 40px; margin-top: 20px; }
     </style>
 </head>
 <body>
-    
     <div class="brand-header">
         <div class="brand-dot"></div>
         <span>PDFBIRCH.APP</span>
     </div>
 
     <div class="layout-grid">
-        
         <div class="side-ad left">
             <script type="text/javascript">
                 atOptions = { 'key' : '59bcd34a7d0fbed85bbe98e1b3aa6e8b', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
@@ -173,7 +171,6 @@ HTML_PAGE = """
         <div class="main-card">
             <h1>Pdfbirch - Entropy Engine</h1>
             <p>Generate high-variance, cryptographically unique English datasets for pipeline validation.</p>
-            
             <button class="btn-primary" id="start-btn" onclick="startSequence()">Initialize Sequence</button>
 
             <div class="loader-container" id="loader">
@@ -183,14 +180,12 @@ HTML_PAGE = """
 
             <div class="ad-stack-wrapper">
                 <span class="ad-stack-label">Sponsored Placements</span>
-                
                 <div class="ad-slot-inner ad-small">
                     <script type="text/javascript">
                         atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
                     </script>
                     <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
                 </div>
-                
                 <div class="ad-slot-inner ad-big">
                      <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%;">
                         <script type="text/javascript">
@@ -199,7 +194,6 @@ HTML_PAGE = """
                         <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
                      </div>
                 </div>
-                
                 <div class="ad-slot-inner ad-small">
                     <script type="text/javascript">
                         atOptions = { 'key' : '3bab905f2f3178c02c3534a0ea5773f6', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -207,6 +201,7 @@ HTML_PAGE = """
                     <script type="text/javascript" src="//www.highperformanceformat.com/3bab905f2f3178c02c3534a0ea5773f6/invoke.js"></script>
                 </div>
             </div>
+            
             <div class="results-area" id="results">
                 <div style="text-align: left; margin-bottom: 12px; font-family:'JetBrains Mono'; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing:1px;">Manifest Ready</div>
                 <a href="/api/download" class="download-item"><span>Dataset_Batch_A83.pdf</span> <span>↓</span></a>
@@ -224,15 +219,10 @@ HTML_PAGE = """
             </script>
             <script type="text/javascript" src="//www.highperformanceformat.com/59bcd34a7d0fbed85bbe98e1b3aa6e8b/invoke.js"></script>
         </div>
-
     </div>
 
     <div class="footer-legal">
         <p style="margin: 0;">&copy; 2026 Pdfbirch.app &bull; <span style="color: #64748b;">Privacy & Testing Tool</span></p>
-        <p style="margin: 6px 0 0 0; font-size: 10px;">
-            Generated documents are intended for pipeline validation, system load testing, and privacy protection.<br>
-            Not affiliated with any third-party file hosting platforms.
-        </p>
     </div>
 
     <script>
@@ -258,7 +248,7 @@ HTML_PAGE = """
 </html>
 """
 
-# --- 2. THE BACKEND (The Brains) ---
+# --- 2. BACKEND LOGIC ---
 WORDS = ["strategy", "growth", "market", "value", "user", "product", "system", "data", "cloud", "AI", "project", "scale"]
 
 def get_random_sentence():
@@ -277,20 +267,16 @@ def generate_messy_pdf():
             size = random.randint(10, 14)
             pdf.set_font(family, style, size)
             pdf.multi_cell(0, 10, get_random_sentence(), align='L')
-            
-            # Anti-Detector Noise
             pdf.set_text_color(255, 255, 255)
             pdf.set_font('Arial', '', 6)
             noise = ''.join(random.choices(string.ascii_letters, k=10))
             pdf.cell(0, 5, noise, ln=1)
             pdf.set_text_color(0, 0, 0)
-
     pdf_string = pdf.output(dest='S')
     buffer = io.BytesIO(pdf_string.encode('latin-1'))
     buffer.seek(0)
     return buffer
 
-# --- ROUTES ---
 @app.route('/')
 def home():
     return HTML_PAGE
@@ -305,5 +291,4 @@ def download():
     except Exception as e:
         return f"Error: {str(e)}"
 
-# Critical for Vercel
 app.debug = True
