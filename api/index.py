@@ -198,8 +198,8 @@ HTML_PAGE = """
 
     <div class="container">
         <div id="user-badge" class="user-badge"><span id="user-email"></span></div>
-        <h1>Entropy Engine</h1>
-        <p>Advanced dataset generation for privacy research. Secure, limited-access mode active.</p>
+        <h1>Free Random PDF Generator</h1>
+        <p>Generate realistic test PDFs with randomized fonts, styles, and content. Perfect for development, QA testing, and placeholder documents.</p>
         
         <button class="btn" id="login-btn" onclick="signIn()">Enter Engine</button>
 
@@ -228,7 +228,16 @@ HTML_PAGE = """
         </div>
     </div>
 
-    <footer>&copy; 2026 Pdfbirch &bull; 24h Security Window Active</footer>
+    <footer>
+    <div style="max-width:700px; margin:0 auto 20px auto; text-align:center; color:#94a3b8; font-size:12px; line-height:1.8;">
+        <strong style="color:#64748b;">Free PDF Generator Tools:</strong><br>
+        Random PDF Generator • Test Document Creator • Fake PDF Maker • Online Document Generator • 
+        Placeholder PDF Creator • Development Test Files • QA Testing Documents • Privacy-First PDF Tools
+    </div>
+    <div style="color:#cbd5e1; font-size:11px; opacity:0.7;">
+        &copy; 2026 Pdfbirch &bull; For Testing & Development Purposes
+    </div>
+</footer>
 
     <script>
         const firebaseConfig = {
