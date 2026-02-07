@@ -226,7 +226,7 @@ HTML_PAGE = """
 
     <div class="nav">
         <a href="/" class="logo"><div class="dot" role="img" aria-label="Pdfbirch logo"></div>PDFBIRCH.APP</a>
-        <a href="https://www.buymeacoffee.com/YOUR_BMAC_USER" target="_blank" style="font-size: 13px; font-weight: 700; color: var(--muted); text-decoration: none;">☕ Support</a>
+        <a href="https://www.buymeacoffee.com/sherlock2803" target="_blank" style="font-size: 13px; font-weight: 700; color: var(--muted); text-decoration: none;">☕ Support</a>
     </div>
 
     <div class="container">
