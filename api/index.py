@@ -548,20 +548,7 @@ def sitemap():
   </url>
 </urlset>""", 200, {'Content-Type': 'application/xml'}
 
-@app.route('/sitemap.xml')
-def sitemap():
-    return """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://pdfbirch.app</loc>
-    <lastmod>2026-02-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>""", 200, {'Content-Type': 'application/xml'}
-
-# ADD THIS NEW ROUTE HERE 👇
-@app.route('/api/test-db')
+@app.route('/test-db')  # Changed from /api/test-db
 def test_db():
     """Test database connection"""
     try:
@@ -589,6 +576,7 @@ def test_db():
             "error": str(e),
             "db_url_exists": db_url is not None if 'db_url' in locals() else False
         }), 500
+
 
 @app.route('/api/check_limit')
 def check_limit():
