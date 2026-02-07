@@ -127,12 +127,24 @@ HTML_PAGE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pdfbirch | Privacy Engine</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+   <title>Free PDF Generator - Random Test Documents | Pdfbirch</title>
+<meta name="description" content="Generate random PDFs instantly. Free online PDF maker with realistic content & varied fonts. Perfect for testing, development, placeholder documents. No signup for preview, 20 free daily with Google login.">
+<meta name="keywords" content="pdf generator, random pdf, test documents, fake pdf, pdf maker, document generator, placeholder pdf, development tools">
+<meta name="author" content="Pdfbirch">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Free Random PDF Generator - Pdfbirch">
+<meta property="og:description" content="Generate realistic test PDFs with varied fonts and content. Free online document generator for developers.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pdfbirch.app">
+<meta property="og:site_name" content="Pdfbirch">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free Random PDF Generator - Pdfbirch">
+<meta name="twitter:description" content="Generate realistic test PDFs instantly. Perfect for testing and development.">
 
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #f8fafc; --primary: #0f172a; --accent: #22c55e; --muted: #94a3b8; }
         body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--primary); background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; }
