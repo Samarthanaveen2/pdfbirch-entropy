@@ -548,6 +548,52 @@ def sitemap():
   </url>
 </urlset>""", 200, {'Content-Type': 'application/xml'}
 
+@app.route('/sitemap.xml')
+def sitemap():
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://pdfbirch.app</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>""", 200, {'Content-Type': 'application/xml'}
+
+# ADD THIS NEW ROUTE HERE 👇
+@app.route('/api/test-db')
+def test_db():
+    """Test database connection"""
+    try:
+        db_url = os.getenv('DATABASE_URL')
+        if not db_url:
+            return jsonify({"error": "DATABASE_URL not set"}), 500
+        
+        # Try to connect
+        conn = psycopg2.connect(db_url, sslmode='require')
+        cur = conn.cursor()
+        cur.execute('SELECT 1')
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            "status": "success",
+            "message": "Database connection works!",
+            "db_url_exists": True,
+            "db_url_preview": db_url[:20] + "..." if len(db_url) > 20 else db_url
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "db_url_exists": db_url is not None if 'db_url' in locals() else False
+        }), 500
+
+@app.route('/api/check_limit')
+def check_limit():
+    # rest of your code...
+
 @app.route('/api/check_limit')
 def check_limit():
     """Check if user has quota left - DOES NOT increment counter"""
