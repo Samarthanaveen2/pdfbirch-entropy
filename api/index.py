@@ -18,7 +18,7 @@ HTML_PAGE = """
         body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--primary); background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 32px 32px; }
         
         .nav { width: 100%; max-width: 1100px; padding: 40px 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; text-decoration: none; color: inherit; }
+        .logo { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; text-decoration: none; color: inherit; margin-left: 20px; }
         .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
 
         .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 500px; padding: 0 20px; box-sizing: border-box; text-align: center; }
