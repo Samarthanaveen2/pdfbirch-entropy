@@ -383,14 +383,8 @@ HTML_PAGE = """
             }, 600);
         }
 
-      async function downloadPDF(_, filename) {
+     async function downloadPDF(token, filename) {
     try {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        // ✅ FIX: always get a fresh Firebase token
-        const token = await user.getIdToken(true);
-
         const res = await fetch('/api/download', {
             method: 'POST',
             headers: {
@@ -406,24 +400,9 @@ HTML_PAGE = """
         }
 
         if (!res.ok) {
-            alert('Download failed.');
+            alert('Download failed. Please try again.');
             return;
         }
-
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-    } catch (e) {
-        console.error(e);
-        alert('Download error');
-    }
-}
 
 
                 const blob = await res.blob();
